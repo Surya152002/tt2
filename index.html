@@ -11,7 +11,8 @@
 </head>
 <body>
 	<canvas id="sensorCanvas"></canvas>
-
+	<button id="startButton">Start</button>
+	
 	<script>
 		// Get the canvas element
 		const canvas = document.getElementById("sensorCanvas");
@@ -27,6 +28,7 @@
 		let endTime = 0;
 		let prevBeta = 0;
 		let hasProperSeating = false;
+		let eventListenerAdded = false;
 
 		// Function to update the canvas with the sensor data
 		function updateCanvas(beta) {
@@ -84,6 +86,11 @@
 				prevBeta = roundedBeta;
 				hasProperSeating = false;
 			}
+		}
+		// Function to start the event listeners
+		function startEventListeners() {
+			window.addEventListener("deviceorientation", deviceOrientationHandler);
+			eventListenerAdded = true;
 		}
 
 		// Event listener for device orientation change
