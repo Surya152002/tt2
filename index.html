@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Beta Sensor Value</title>
+	<style>
+		#sensorCanvas {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="sensorCanvas"></canvas>
+
+	<script>
+		// Get the canvas element
+		const canvas = document.getElementById("sensorCanvas");
+
+		// Get the 2D context of the canvas
+		const ctx = canvas.getContext("2d");
+
+		// Set the font style for displaying text
+		ctx.font = "10px Arial"; // increased font size
+
+		// Variables to track time and beta value
+		let startTime = 0;
+		let endTime = 0;
+		let prevBeta = 0;
+		let hasProperSeating = false;
+
+		// Function to update the canvas with the sensor data
+		function updateCanvas(beta) {
+			// Clear the canvas
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Round the beta value to the nearest integer
+			const roundedBeta = Math.round(beta);
+
+			if (roundedBeta < 80) {
+				// Display message for proper seating
+				ctx.fillText(`Proper Seating: Beta value ${roundedBeta}`, 10, 50);
+
+				// Reset time tracking variables
+				startTime = 0;
+				endTime = 0;
+				prevBeta = roundedBeta;
+				hasProperSeating = true;
+			} else if (roundedBeta >= 80 && roundedBeta <= 87) {
+				if (!hasProperSeating) {
+					// Display message for proper seating first
+					ctx.fillText(`Proper Seating Required`, 10, 50);
+				} else if (prevBeta < 80 || prevBeta > 87) {
+					// Display message for intermediate position
+					ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
+
+					// Start tracking time
+					startTime = new Date().getTime();
+					endTime = 0;
+				} else {
+					// Continue tracking time
+					endTime = new Date().getTime();
+					const timeDiff = (endTime - startTime) / 1000;
+					const timeMessage = `Time: ${timeDiff.toFixed(2)} seconds`;
+
+					// Display time message
+					ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
+					ctx.fillText(timeMessage, 10, 100);
+				}
+
+				// Update previous beta value
+				prevBeta = roundedBeta;
+			} else {
+				// Display message for proper seating
+				ctx.fillText(`Proper Seating: Beta value ${roundedBeta}`, 10, 50);
+
+				// Reset time tracking variables
+				startTime = 0;
+				endTime = 0;
+				prevBeta = roundedBeta;
+				hasProperSeating = false;
+			}
+		}
+
+		// Event listener for device orientation change
+		window.addEventListener("deviceorientation", (event) => {
+			// Get the beta value from the sensor data
+			const beta = event.beta;
+
+			// Update the canvas with the beta value
+			updateCanvas(beta);
+		});
+	</script>
+</body>
+</html>
