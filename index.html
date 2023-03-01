@@ -20,7 +20,7 @@
 		const ctx = canvas.getContext("2d");
 
 		// Set the font style for displaying text
-		ctx.font = "10px Arial"; // increased font size
+		ctx.font = "50px Arial"; // increased font size
 
 		// Variables to track time and beta value
 		let startTime = 0;
@@ -60,11 +60,16 @@
 					// Continue tracking time
 					endTime = new Date().getTime();
 					const timeDiff = (endTime - startTime) / 1000;
-					const timeMessage = `Time: ${timeDiff.toFixed(2)} seconds`;
 
-					// Display time message
-					ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
-					ctx.fillText(timeMessage, 10, 100);
+					if (timeDiff > 60) {
+						// Display message if time exceeds 60 seconds
+						ctx.fillText(`User not properly seated`, 10, 150);
+					} else {
+						// Display time message
+						const timeMessage = `Time: ${timeDiff.toFixed(2)} seconds`;
+						ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
+						ctx.fillText(timeMessage, 10, 100);
+					}
 				}
 
 				// Update previous beta value
