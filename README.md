@@ -1,4 +1,4 @@
-# tt2
+# TT2
 # **Beta Sensor Value**
 This is a simple HTML, CSS, and JavaScript-based application that uses the device orientation sensor of a mobile device to measure the beta value and display messages based on the value. The application displays different messages based on whether the user is properly seated or not.
 
