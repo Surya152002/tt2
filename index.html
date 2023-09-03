@@ -39,23 +39,6 @@
       }
     };
 
-    // Function to send sensor data to the server
-    function sendSensorData(beta) {
-      ws.send(JSON.stringify({ type: 'sensorData', beta }));
-    }
-
-    // Replace this part with your actual sensor data collection logic
-    function collectSensorData() {
-      // Simulate collecting the beta sensor value (replace with actual code)
-      const betaValue = Math.random() * 180; // Replace with actual sensor data
-
-      // Send the beta sensor value to the server
-      sendSensorData(betaValue);
-    }
-
-    // Call the data collection function at a desired interval
-    setInterval(collectSensorData, 1000); // Adjust the interval as needed
-
     // Function to display the sensor value on the canvas
     function displaySensorValue(beta) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
