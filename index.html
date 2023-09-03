@@ -25,7 +25,7 @@
     let eventListenerAdded = false;
 
     // WebSocket connection to the server
-    const ws = new WebSocket("ws://192.168.0.12:3000"); // Replace with your laptop's IP address
+    const ws = new WebSocket("ws://YOUR_LAPTOP_IP:3000"); // Replace with your laptop's IP address
 
     // Function to update the canvas with the sensor data
     function updateCanvas(beta) {
@@ -95,18 +95,31 @@
     }
 
     // Event listener for device orientation change
-    window.addEventListener("deviceorientation", (event) => {
+    function deviceOrientationHandler(event) {
       // Get the beta value from the sensor data
       const beta = event.beta;
 
       // Update the canvas with the beta value
       updateCanvas(beta);
-    });
+    }
 
     // Ensure event listeners are started once the page is loaded
     window.addEventListener("load", () => {
       if (!eventListenerAdded) {
         startEventListeners();
+      }
+    });
+
+    // WebSocket event handler for incoming data
+    ws.addEventListener("message", (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.sensorValue !== undefined) {
+          // Update the canvas with the sensor value received from the server
+          updateCanvas(data.sensorValue);
+        }
+      } catch (error) {
+        console.error("Error parsing message:", error);
       }
     });
   </script>
