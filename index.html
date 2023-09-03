@@ -10,8 +10,8 @@
   </style>
 </head>
 <body>
+  <div id="statusIndicator"></div>
   <canvas id="sensorCanvas"></canvas>
-  <button id="startButton">Start</button>
 
   <script>
     const canvas = document.getElementById("sensorCanvas");
@@ -27,6 +27,18 @@
     // WebSocket connection to the server
     const ws = new WebSocket("ws://192.168.0.12:3000"); // Replace with your laptop's IP address
 
+    // Function to update the status indicator
+    function updateStatusIndicator(connected) {
+      const statusIndicator = document.getElementById("statusIndicator");
+      if (connected) {
+        statusIndicator.textContent = "Connected to Server";
+        statusIndicator.style.color = "green";
+      } else {
+        statusIndicator.textContent = "Not Connected to Server";
+        statusIndicator.style.color = "red";
+      }
+    }
+
     // Function to update the canvas with the sensor data
     function updateCanvas(beta) {
       // Clear the canvas
@@ -35,54 +47,7 @@
       // Round the beta value to the nearest integer
       const roundedBeta = Math.round(beta);
 
-      if (roundedBeta < 80) {
-        // Display message for proper seating
-        ctx.fillText(`Proper Seating: Beta value ${roundedBeta}`, 10, 50);
-
-        // Reset time tracking variables
-        startTime = 0;
-        endTime = 0;
-        prevBeta = roundedBeta;
-        hasProperSeating = true;
-      } else if (roundedBeta >= 80 && roundedBeta <= 87) {
-        if (!hasProperSeating) {
-          // Display message for proper seating first
-          ctx.fillText(`Proper Seating Required`, 10, 50);
-        } else if (prevBeta < 80 || prevBeta > 87) {
-          // Display message for intermediate position
-          ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
-
-          // Start tracking time
-          startTime = new Date().getTime();
-          endTime = 0;
-        } else {
-          // Continue tracking time
-          endTime = new Date().getTime();
-          const timeDiff = (endTime - startTime) / 1000;
-
-          if (timeDiff > 60) {
-            // Display message if time exceeds 60 seconds
-            ctx.fillText(`User not properly seated`, 10, 150);
-          } else {
-            // Display time message
-            const timeMessage = `Time: ${timeDiff.toFixed(2)} seconds`;
-            ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
-            ctx.fillText(timeMessage, 10, 100);
-          }
-        }
-
-        // Update previous beta value
-        prevBeta = roundedBeta;
-      } else {
-        // Display message for proper seating
-        ctx.fillText(`Initial Seating: Beta value ${roundedBeta}`, 10, 50);
-
-        // Reset time tracking variables
-        startTime = 0;
-        endTime = 0;
-        prevBeta = roundedBeta;
-        hasProperSeating = false;
-      }
+      // ... (Rest of your canvas update code)
 
       // Send the sensor value to the server
       ws.send(JSON.stringify({ sensorValue: beta }));
@@ -110,7 +75,17 @@
       }
     });
 
-    // WebSocket event handler for incoming data
+    // WebSocket event handlers
+    ws.addEventListener("open", () => {
+      // Connection to the server is open
+      updateStatusIndicator(true);
+    });
+
+    ws.addEventListener("close", () => {
+      // Connection to the server is closed
+      updateStatusIndicator(false);
+    });
+
     ws.addEventListener("message", (event) => {
       try {
         const data = JSON.parse(event.data);
