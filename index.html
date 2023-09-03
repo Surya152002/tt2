@@ -11,7 +11,7 @@
     const messageElement = document.getElementById('message');
     const sensorValueElement = document.getElementById('sensorValue');
 
-    const ws = new WebSocket('ws://laptop-ip:3000'); // Replace 'laptop-ip' with the laptop's IP address
+    const ws = new WebSocket('ws://192.168.0.12:3000'); // Replace 'laptop-ip' with the laptop's IP address
 
     ws.onopen = () => {
       // Connection is open, display the "connected" message on the mobile screen
