@@ -5,24 +5,37 @@
 </head>
 <body>
   <div id="message"></div>
-  <p>Beta Sensor Value: <span id="sensorValue">Loading...</span></p>
-
+  <canvas id="sensorCanvas" width="400" height="200"></canvas> <!-- Canvas element for displaying sensor value -->
+  
   <script>
     const messageElement = document.getElementById('message');
-    const sensorValueElement = document.getElementById('sensorValue');
+    const canvas = document.getElementById('sensorCanvas');
+    const ctx = canvas.getContext('2d');
 
-    const ws = new WebSocket('ws://192.168.0.12:3000'); // Replace 'laptop-ip' with the laptop's IP address
+    const ws = new WebSocket('ws://server-ip:3000'); // Replace 'server-ip' with the server's IP address
 
     ws.onopen = () => {
       // Connection is open, display the "connected" message on the mobile screen
       messageElement.innerText = 'Connected to the server';
+
+      // Request permission to share time
+      ws.send(JSON.stringify({ type: 'requestPermission' }));
     };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'displayMessage') {
-        // Display the message received from the server
-        messageElement.innerText = data.message;
+
+      if (data.type === 'permissionGranted') {
+        // Permission to share time has been granted
+        console.log('Permission granted to share time.');
+
+        // Implement your time-sharing logic here
+      } else if (data.type === 'permissionDenied') {
+        // Permission to share time has been denied
+        console.log('Permission denied to share time.');
+      } else if (data.type === 'displaySensorValue') {
+        // Display the sensor value on the canvas
+        displaySensorValue(data.beta);
       }
     };
 
@@ -38,13 +51,18 @@
 
       // Send the beta sensor value to the server
       sendSensorData(betaValue);
-
-      // Display the beta sensor value on the mobile screen
-      sensorValueElement.innerText = betaValue.toFixed(2);
     }
 
     // Call the data collection function at a desired interval
     setInterval(collectSensorData, 1000); // Adjust the interval as needed
+
+    // Function to display the sensor value on the canvas
+    function displaySensorValue(beta) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'black';
+      ctx.font = '20px Arial';
+      ctx.fillText(`Beta Sensor Value: ${beta.toFixed(2)}`, 10, 30);
+    }
   </script>
 </body>
 </html>
