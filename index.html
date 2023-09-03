@@ -20,9 +20,9 @@
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'displaySensorData') {
-        // Display the beta sensor value on the mobile screen
-        sensorValueElement.innerText = data.beta.toFixed(2);
+      if (data.type === 'displayMessage') {
+        // Display the message received from the server
+        messageElement.innerText = data.message;
       }
     };
 
