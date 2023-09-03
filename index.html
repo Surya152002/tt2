@@ -1,52 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Beta Sensor Value</title>
+  <title>Mobile Sensor</title>
 </head>
 <body>
-  <button id="startButton">Start</button>
+  <div id="message"></div>
+  <p>Beta Sensor Value: <span id="sensorValue">Loading...</span></p>
 
   <script>
-    // Function to send sensor data to the laptop
-    function sendSensorData(data) {
-      // Create a WebSocket connection to the laptop's server
-      const socket = new WebSocket('ws://192.168.56.1:3000'); // Replace with the laptop's IP address
+    const messageElement = document.getElementById('message');
+    const sensorValueElement = document.getElementById('sensorValue');
 
-      // Event listener for when the WebSocket connection is established
-      socket.addEventListener('open', (event) => {
-        console.log('WebSocket connection established.');
-        // Send data as a JSON string or in a format suitable for your application
-        socket.send(JSON.stringify(data));
-      });
+    const ws = new WebSocket('ws://laptop-ip:3000'); // Replace 'laptop-ip' with the laptop's IP address
 
-      // Handle errors and close events as needed
-      socket.addEventListener('error', (error) => {
-        console.error('WebSocket error:', error);
-      });
+    ws.onopen = () => {
+      // Connection is open, display the "connected" message on the mobile screen
+      messageElement.innerText = 'Connected to the server';
+    };
 
-      socket.addEventListener('close', (event) => {
-        console.log('WebSocket connection closed:', event.code, event.reason);
-      });
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'displaySensorData') {
+        // Display the beta sensor value on the mobile screen
+        sensorValueElement.innerText = data.beta.toFixed(2);
+      }
+    };
+
+    // Function to send sensor data to the server
+    function sendSensorData(beta) {
+      ws.send(JSON.stringify({ type: 'sensorData', beta }));
     }
 
-    // Mock sensor data collection
-    function mockSensorData() {
-      const interval = setInterval(() => {
-        const beta = Math.random() * 180 - 90; // Simulate beta values between -90 and 90
-        sendSensorData({ beta });
-      }, 1000); // Adjust the interval as needed
+    // Replace this part with your actual sensor data collection logic
+    function collectSensorData() {
+      // Simulate collecting the beta sensor value (replace with actual code)
+      const betaValue = Math.random() * 180; // Replace with actual sensor data
 
-      // Stop sending data after a certain time (e.g., 10 seconds)
-      setTimeout(() => {
-        clearInterval(interval);
-        console.log('Sensor data collection stopped.');
-      }, 10000);
+      // Send the beta sensor value to the server
+      sendSensorData(betaValue);
+
+      // Display the beta sensor value on the mobile screen
+      sensorValueElement.innerText = betaValue.toFixed(2);
     }
 
-    // Add click event listener to the Start button
-    document.getElementById('startButton').addEventListener('click', () => {
-      mockSensorData();
-    });
+    // Call the data collection function at a desired interval
+    setInterval(collectSensorData, 1000); // Adjust the interval as needed
   </script>
 </body>
 </html>
