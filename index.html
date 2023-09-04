@@ -18,7 +18,7 @@
     const canvas = document.getElementById('sensorCanvas');
     const ctx = canvas.getContext('2d');
 
-    const ws = new WebSocket('ws://192.168.0.12:3000'); // Replace 'server-ip' with the server's IP address
+    const ws = new WebSocket('ws://192.168.56.1:3000'); // Replace 'server-ip' with the server's IP address
     ctx.fillText(`Proper Seating: Beta value ${beta}`, 50, 50);
     ws.onopen = () => {
       // Connection is open, display the "connected" message on the mobile screen
