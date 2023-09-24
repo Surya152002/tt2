@@ -1,36 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Orientation Data Collector</title>
+    <title>Beta Sensor Value</title>
 </head>
 <body>
+    <button onclick="connectBluetooth()">Connect to Bluetooth</button>
+    <div id="output"></div> <!-- This div will display the information -->
 
-<div id="output">Waiting for data...</div>
+    <script>
+        async function connectBluetooth() {
+            const outputDiv = document.getElementById('output');
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['device_information']  // List known services here if any
+                });
 
-<script>
-    var ws = new WebSocket('ws://192.168.56.1:8765');
+                const server = await device.gatt.connect();
+                const services = await server.getPrimaryServices();
 
-    ws.onopen = function(event) {
-        console.log('Connection is open ...');
-        document.getElementById('output').innerHTML = 'Connection is open ...';
-    };
+                let outputText = '';
+                for (const service of services) {
+                    outputText += `Service: ${service.uuid}<br>`;
+                    console.log(`Service: ${service.uuid}`);
+                    const characteristics = await service.getCharacteristics();
 
-    ws.onerror = function(err) {
-        console.error('WebSocket Error: ', err);
-        document.getElementById('output').innerHTML = 'WebSocket Error: ' + err;
-    };
-
-    window.addEventListener('deviceorientation', function(event) {
-        var beta = event.beta;
-        console.log('Beta value:', beta);
-        document.getElementById('output').innerHTML = 'Beta value: ' + beta;
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({beta: beta}));
+                    for (const characteristic of characteristics) {
+                        outputText += `&nbsp;&nbsp;Characteristic: ${characteristic.uuid}<br>`;
+                        console.log(`  Characteristic: ${characteristic.uuid}`);
+                    }
+                }
+                outputDiv.innerHTML = outputText;  // Set the HTML content of the output div
+            } catch (error) {
+                console.error('Bluetooth Error:', error);
+                outputDiv.innerHTML = `Bluetooth Error: ${error}`;  // Display error in the output div
+            }
         }
-    });
-</script>
-
+    </script>
 </body>
 </html>
