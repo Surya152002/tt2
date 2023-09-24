@@ -7,23 +7,22 @@
 </head>
 <body>
 <script>
+    var ws = new WebSocket('ws://192.168.0.11:8765');
+
+    ws.onopen = function(event) {
+        console.log('Connection is open ...');
+    };
+
+    ws.onerror = function(err) {
+        console.error('WebSocket Error: ', err);
+    };
+
     window.addEventListener('deviceorientation', function(event) {
         var beta = event.beta;
-        // Restricting the range to capture the beta value
-        if(beta > 45) beta = 45;
-        if(beta < -45) beta = -45;
-        sendData(beta);
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({beta: beta}));
+        }
     });
-
-    function sendData(beta) {
-        fetch('http://127.0.0.1:5000/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({beta: beta})
-        });
-    }
 </script>
 </body>
 </html>
