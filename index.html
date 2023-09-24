@@ -6,23 +6,31 @@
     <title>Device Orientation Data Collector</title>
 </head>
 <body>
+
+<div id="output">Waiting for data...</div>
+
 <script>
     var ws = new WebSocket('ws://192.168.0.11:8765');
 
     ws.onopen = function(event) {
         console.log('Connection is open ...');
+        document.getElementById('output').innerHTML = 'Connection is open ...';
     };
 
     ws.onerror = function(err) {
         console.error('WebSocket Error: ', err);
+        document.getElementById('output').innerHTML = 'WebSocket Error: ' + err;
     };
 
     window.addEventListener('deviceorientation', function(event) {
         var beta = event.beta;
+        console.log('Beta value:', beta);
+        document.getElementById('output').innerHTML = 'Beta value: ' + beta;
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({beta: beta}));
         }
     });
 </script>
+
 </body>
 </html>
