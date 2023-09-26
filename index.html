@@ -12,11 +12,7 @@
 <body>
   <div id="statusIndicator"></div>
 
-  <!-- Existing HTML code... -->
-	<div id="statusIndicator"></div>
-	<div id="betaValue">Beta Value: --</div>
-	<div id="flagValue">Flag Value: --</div>
-	<div id="statusMessage">Status: --</div>
+  
 	<canvas id="sensorCanvas"></canvas>
 <!-- ... -->
 
@@ -88,72 +84,7 @@
           }
         }
       }
-	const betaElement = document.getElementById("betaValue");
-    const flagElement = document.getElementById("flagValue");
-    const statusElement = document.getElementById("statusMessage");
-
-    // Update the HTML elements with the current beta and flag values
-    betaElement.textContent = `Beta Value: ${beta}`;
-    flagElement.textContent = `Flag Value: ${flag}`;
-    
-    // Determine the status message based on the flag value
-    let statusMessage = 'Status: --';
-    if (flag === 1) {
-        statusMessage = 'Status: User is taking a break';
-    } else if (flag === 2) {
-        statusMessage = 'Status: User came back to sitting position';
-    }
-    
-    // Update the status message element
-    statusElement.textContent = statusMessage;
-      if (roundedBeta < 80) {
-				// Display message for proper seating
-				ctx.fillText(`Proper Seating: Beta value ${roundedBeta}`, 10, 50);
-
-				// Reset time tracking variables
-				startTime = 0;
-				endTime = 0;
-				prevBeta = roundedBeta;
-				hasProperSeating = true;
-			} else if (roundedBeta >= 80 && roundedBeta <= 87) {
-				if (!hasProperSeating) {
-					// Display message for proper seating first
-					ctx.fillText(`Proper Seating Required`, 10, 50);
-				} else if (prevBeta < 80 || prevBeta > 87) {
-					// Display message for intermediate position
-					ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
-
-					// Start tracking time
-					startTime = new Date().getTime();
-					endTime = 0;
-				} else {
-					// Continue tracking time
-					endTime = new Date().getTime();
-					const timeDiff = (endTime - startTime) / 1000;
-
-					if (timeDiff > 60) {
-						// Display message if time exceeds 60 seconds
-						ctx.fillText(`User not properly seated`, 10, 150);
-					} else {
-						// Display time message
-						const timeMessage = `Time: ${timeDiff.toFixed(2)} seconds`;
-						ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
-						ctx.fillText(timeMessage, 10, 100);
-					}
-				}
-
-				// Update previous beta value
-				prevBeta = roundedBeta;
-			} else {
-				// Display message for proper seating ///fuoghsudoghruoghsuhou
-				ctx.fillText(`Initial Seating: Beta value ${roundedBeta}`, 10, 50);
-
-				// Reset time tracking variables
-				startTime = 0;
-				endTime = 0;
-				prevBeta = roundedBeta;
-				hasProperSeating = false;
-			}
+	
 
       // Send the sensor value to the server along with the flag value
       ws.send(JSON.stringify({ sensorValue: beta, flag: flag }));
