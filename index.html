@@ -24,8 +24,7 @@
     let hasProperSeating = false;
     let eventListenerAdded = false;
 
-    // WebSocket connection to the server
-    const ws = new WebSocket("ws://192.168.27.104:5000"); // Replace with your laptop's IP address
+
 
     // Function to update the status indicator
     function updateStatusIndicator(connected) {
@@ -47,10 +46,7 @@
       // Round the beta value to the nearest integer
       const roundedBeta = Math.round(beta);
 
-      // ... (Rest of your canvas update code)
-
-      // Send the sensor value to the server
-      ws.send(JSON.stringify({ sensorValue: beta }));
+  
     }
 
     // Function to start the event listeners
@@ -75,28 +71,7 @@
       }
     });
 
-    // WebSocket event handlers
-    ws.addEventListener("open", () => {
-      // Connection to the server is open
-      updateStatusIndicator(true);
-    });
-
-    ws.addEventListener("close", () => {
-      // Connection to the server is closed
-      updateStatusIndicator(false);
-    });
-
-    ws.addEventListener("message", (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.sensorValue !== undefined) {
-          // Update the canvas with the sensor value received from the server
-          updateCanvas(data.sensorValue);
-        }
-      } catch (error) {
-        console.error("Error parsing message:", error);
-      }
-    });
+    
   </script>
 </body>
 </html>
