@@ -12,11 +12,21 @@
 <body>
   <div id="statusIndicator"></div>
   <canvas id="sensorCanvas"></canvas>
+  <!-- Existing HTML code... -->
+	<div id="statusIndicator"></div>
+	<div id="betaValue">Beta Value: --</div>
+	<div id="flagValue">Flag Value: --</div>
+	<div id="statusMessage">Status: --</div>
+	<canvas id="sensorCanvas"></canvas>
+<!-- ... -->
+
 
   <script>
     const canvas = document.getElementById("sensorCanvas");
     const ctx = canvas.getContext("2d");
     ctx.font = "15px Arial";
+
+    
 
     let startTime = 0;
     let endTime = 0;
@@ -78,7 +88,24 @@
           }
         }
       }
+	const betaElement = document.getElementById("betaValue");
+    const flagElement = document.getElementById("flagValue");
+    const statusElement = document.getElementById("statusMessage");
 
+    // Update the HTML elements with the current beta and flag values
+    betaElement.textContent = `Beta Value: ${beta}`;
+    flagElement.textContent = `Flag Value: ${flag}`;
+    
+    // Determine the status message based on the flag value
+    let statusMessage = 'Status: --';
+    if (flag === 1) {
+        statusMessage = 'Status: User is taking a break';
+    } else if (flag === 2) {
+        statusMessage = 'Status: User came back to sitting position';
+    }
+    
+    // Update the status message element
+    statusElement.textContent = statusMessage;
       if (roundedBeta < 80) {
 				// Display message for proper seating
 				ctx.fillText(`Proper Seating: Beta value ${roundedBeta}`, 10, 50);
