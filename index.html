@@ -10,10 +10,14 @@
   </style>
 </head>
 <body>
-  <div id="statusIndicator"></div>
-
   
-	<canvas id="sensorCanvas"></canvas>
+<!-- Existing HTML code... -->
+<div id="statusIndicator"></div>
+<div id="betaValue">Beta Value: --</div>
+<div id="flagValue">Flag Value: --</div>
+<div id="statusMessage">Status: --</div>
+<canvas id="sensorCanvas"></canvas>
+<
 <!-- ... -->
 
 
@@ -89,6 +93,31 @@
       // Send the sensor value to the server along with the flag value
       ws.send(JSON.stringify({ sensorValue: beta, flag: flag }));
     }
+function updateCanvas(beta) {
+    // ... existing code ...
+
+    // Get the HTML elements
+    const betaElement = document.getElementById("betaValue");
+    const flagElement = document.getElementById("flagValue");
+    const statusElement = document.getElementById("statusMessage");
+
+    // Update the HTML elements with the current beta and flag values
+    betaElement.textContent = `Beta Value: ${beta}`;
+    flagElement.textContent = `Flag Value: ${flag}`;
+    
+    // Determine the status message based on the flag value
+    let statusMessage = 'Status: --';
+    if (flag === 1) {
+        statusMessage = 'Status: User is taking a break';
+    } else if (flag === 2) {
+        statusMessage = 'Status: User came back to sitting position';
+    }
+    
+    // Update the status message element
+    statusElement.textContent = statusMessage;
+
+    // ... rest of the existing code ...
+}
 
     // Function to start the event listeners
     function startEventListeners() {
