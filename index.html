@@ -165,10 +165,13 @@
             const flagElement = document.getElementById("flagValue");
             flagElement.textContent = `Flag Value: ${value}`;
             sendFlagValue();  // Send updated flag value
-	    socket.send(value.toString());
+	    
         }
 
-        document.getElementById('startButton').addEventListener('click', connectWebSocket);
+        window.onload = function() {
+	    connectWebSocket();
+	}
+
 
             
     
