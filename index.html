@@ -136,7 +136,7 @@
                 let ws;
 
         function connectWebSocket() {
-            ws = new WebSocket('ws://YOUR_COMPUTER_IP_ADDRESS:8080');
+            ws = new WebSocket('ws://192.168.0.11:8080');
 
             ws.addEventListener('open', (event) => {
                 console.log('WebSocket connection opened:', event);
