@@ -15,6 +15,207 @@
     <div id="flagValue">Flag Value: --</div> <!-- Display the flag value -->
     
     <script>
+	    const canvas = document.getElementById("sensorCanvas");
+        const ctx = canvas.getContext("2d");
+        ctx.font = "15px Arial";
+
+        let initialPositionTime = null;
+        let backToSeatTime = null;
+        let seatedTime = null;
+        let flag = 0;
+        
+        function updateFlagValue(value) {
+            const flagElement = document.getElementById("flagValue");
+            flagElement.textContent = `Flag Value: ${value}`;
+        }
+
+        function updateCanvas(beta) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const roundedBeta = Math.round(beta);
+            
+            if (roundedBeta < 80) {
+                if (initialPositionTime === null) {
+                    initialPositionTime = new Date().getTime();
+                }
+                const currentTime = new Date().getTime();
+                const elapsedInitial = (currentTime - initialPositionTime) / 1000;
+                if (elapsedInitial > 20 && flag !== 1) {
+                    flag = 1;
+                    updateFlagValue(flag);
+                    console.log('User is resting');
+                }
+                backToSeatTime = null;  // Reset backToSeatTime
+                seatedTime = null;  // Reset seatedTime
+            } else {
+                initialPositionTime = null;  // Reset initialPositionTime
+                
+                if (backToSeatTime === null) {
+                    backToSeatTime = new Date().getTime();
+                }
+                const currentTime = new Date().getTime();
+                const elapsedBack = (currentTime - backToSeatTime) / 1000;
+                if (elapsedBack > 5 && flag !== 2) {  // 5 seconds threshold for returning to seat
+                    flag = 2;
+                    updateFlagValue(flag);
+                    console.log('User came back to sitting position');
+                }
+                
+                if (seatedTime === null) {
+                    seatedTime = new Date().getTime();
+                }
+                const elapsedSeated = (currentTime - seatedTime) / 1000;
+                if (elapsedSeated > 300 && flag !== 3) {
+                    flag = 3;
+                    updateFlagValue(flag);
+                    console.log('User seated for 300 seconds');
+                }
+            }
+            
+
+
+			if (roundedBeta < 80) {
+				// Display message for proper seating
+				ctx.fillText(`Proper Seating: Beta value ${roundedBeta}`, 10, 50);
+
+				// Reset time tracking variables
+				startTime = 0;
+				endTime = 0;
+				prevBeta = roundedBeta;
+				hasProperSeating = true;
+			} else if (roundedBeta >= 80 && roundedBeta <= 87) {
+				if (!hasProperSeating) {
+					// Display message for proper seating first
+					ctx.fillText(`Proper Seating Required`, 10, 50);
+				} else if (prevBeta < 80 || prevBeta > 87) {
+					// Display message for intermediate position
+					ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
+
+					// Start tracking time
+					startTime = new Date().getTime();
+					endTime = 0;
+				} else {
+					// Continue tracking time
+					endTime = new Date().getTime();
+					const timeDiff = (endTime - startTime) / 1000;
+
+					if (timeDiff > 60) {
+						// Display message if time exceeds 60 seconds
+						ctx.fillText(`User not properly seated`, 10, 150);
+					} else {
+						// Display time message
+						const timeMessage = `Time: ${timeDiff.toFixed(2)} seconds`;
+						ctx.fillText(`Intermediate Position: Beta value ${roundedBeta}`, 10, 50);
+						ctx.fillText(timeMessage, 10, 100);
+					}
+				}
+
+				// Update previous beta value
+				prevBeta = roundedBeta;
+			} else {
+				// Display message for proper seating ///fuoghsudoghruoghsuhou
+				ctx.fillText(`Initial Seating: Beta value ${roundedBeta}`, 10, 50);
+
+				// Reset time tracking variables
+				startTime = 0;
+				endTime = 0;
+				prevBeta = roundedBeta;
+				hasProperSeating = false;
+			}
+        }
+        
+        function startEventListeners() {
+            window.addEventListener("deviceorientation", deviceOrientationHandler);
+        }
+
+        function deviceOrientationHandler(event) {
+            const beta = event.beta;
+            updateCanvas(beta);
+        }
+
+                let ws;
+
+        function connectWebSocket() {
+            ws = new WebSocket('ws://YOUR_COMPUTER_IP_ADDRESS:8080');
+
+            ws.addEventListener('open', (event) => {
+                console.log('WebSocket connection opened:', event);
+                // Send initial flag value
+                sendFlagValue();
+            });
+
+            ws.addEventListener('message', (event) => {
+                console.log('Message from server:', event.data);
+            });
+
+            ws.addEventListener('close', (event) => {
+                console.log('WebSocket connection closed:', event);
+            });
+        }
+
+        function sendFlagValue() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = JSON.stringify({ flag: flag });
+                ws.send(message);
+                console.log('Flag value sent:', message);
+            }
+        }
+
+        function updateFlagValue(value) {
+            const flagElement = document.getElementById("flagValue");
+            flagElement.textContent = `Flag Value: ${value}`;
+            sendFlagValue();  // Send updated flag value
+	    socket.send(value.toString());
+        }
+
+        document.getElementById('startButton').addEventListener('click', connectWebSocket);
+
+            
+    
+
+        window.addEventListener("deviceorientation", deviceOrientationHandler);
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beta Sensor Value</title>
+    <style>
+        #sensorCanvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="sensorCanvas"></canvas>
+    <button id="startButton">Start</button>
+    <div id="flagValue">Flag Value: --</div> <!-- Display the flag value -->
+    
+<!--     <script>
         const canvas = document.getElementById("sensorCanvas");
         const ctx = canvas.getContext("2d");
         ctx.font = "15px Arial";
@@ -136,8 +337,8 @@
         window.addEventListener("deviceorientation", deviceOrientationHandler);
     </script>
 </body>
-</html>
-
+</html> -->
+ -->
 <!-- 
 <!DOCTYPE html>
 <html>
