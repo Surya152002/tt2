@@ -1,33 +1,21 @@
+<!-- File: index.html -->
 <!DOCTYPE html>
 <html>
 <head>
-<title>Device Orientation</title>
-<style>
-    #betaValue {
-        /* your styles here */
-    }
-</style>
+    <title>Device Orientation</title>
 </head>
 <body>
-
-<div id="betaValue"></div>
-
 <script>
 window.addEventListener("deviceorientation", function(event) {
     var beta = event.beta;
-    document.getElementById('betaValue').innerText = "Beta: " + beta;
 
-    // Send beta value to GitHub
-    fetch('https://api.github.com/repos/Surya152002/tt2/contents/data.json', {
-        method: 'PUT',
+    // Send beta value to server
+    fetch('http://192.168.0.11:5000/send', {
+        method: 'POST',
         headers: {
-            'Authorization': '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',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            message: "Update beta value",
-            content: btoa(JSON.stringify({ beta: beta })),
-        }),
+        body: JSON.stringify({ beta: beta }),
     })
     .then(response => response.json())
     .then(data => console.log(data));
