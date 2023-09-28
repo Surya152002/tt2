@@ -10,7 +10,7 @@
   <script>
     const messageElement = document.getElementById('message');
 
-    const ws = new WebSocket('ws://192.168.0.11:5000'); // Update the server IP address
+    const ws = new WebSocket('ws://192.168.0.11:5000');  // Replace '192.168.0.11' with your laptop's IP
 
     ws.onopen = () => {
       // Connection is open, display the "connected" message on the screen
@@ -33,14 +33,14 @@
     // Replace this part with your actual sensor data collection logic
     function collectSensorData() {
       // Simulate collecting the beta sensor value (replace with actual code)
-      const betaValue = Math.random() * 180; // Replace with actual sensor data
+      const betaValue = Math.random() * 180;  // Replace with actual sensor data
 
       // Send the beta sensor value to the server
       sendSensorData(betaValue);
     }
 
     // Call the data collection function at a desired interval
-    setInterval(collectSensorData, 1000); // Adjust the interval as needed
+    setInterval(collectSensorData, 1000);  // Adjust the interval as needed
   </script>
 </body>
 </html>
