@@ -1,41 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Send Data to Laptop</title>
+    <title>Bluetooth Data Sender</title>
 </head>
 <body>
-    <h1>Send Data to Laptop</h1>
-    <form id="dataForm">
-        <label for="data">Data:</label>
-        <input type="text" id="data" name="data" required>
-        <button type="submit">Send Data</button>
-    </form>
+    <button id="connectButton">Connect to Laptop</button>
+    <button id="sendButton">Send Data</button>
 
     <script>
-        document.getElementById("dataForm").addEventListener("submit", function(event) {
-            event.preventDefault();
+        let server = null;
+        let port = null;
 
-            const dataValue = document.getElementById("data").value;
+        async function connect() {
+            try {
+                server = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['serial_port']
+                });
 
-            // Send the data to the laptop via a POST request
-            fetch("http://192.168.0.11:1766/send_data", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/plain"
-                },
-                body: dataValue
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert("Data sent successfully!");
-                } else {
-                    alert("Error sending data. Please try again.");
-                }
-            })
-            .catch(error => {
-                alert("An error occurred: " + error);
-            });
-        });
+                port = await server.gatt.connect();
+                document.getElementById("sendButton").disabled = false;
+            } catch (error) {
+                console.error("Error connecting to laptop:", error);
+            }
+        }
+
+        async function sendData() {
+            try {
+                const message = "Hello, Laptop!";
+                const encoder = new TextEncoder();
+                await port.write(encoder.encode(message));
+                console.log("Data sent:", message);
+            } catch (error) {
+                console.error("Error sending data:", error);
+            }
+        }
+
+        document.getElementById("connectButton").addEventListener("click", connect);
+        document.getElementById("sendButton").addEventListener("click", sendData);
     </script>
 </body>
 </html>
