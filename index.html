@@ -23,13 +23,16 @@
             })
             .then(response => {
                 if (response.ok) {
-                    statusElement.innerHTML = 'Beta value sent successfully.';
+                    return response.text();
                 } else {
-                    statusElement.innerHTML = 'Failed to send beta value.';
+                    throw new Error('Failed to send beta value.');
                 }
             })
+            .then(data => {
+                statusElement.innerHTML = 'Server Response: ' + data;
+            })
             .catch(error => {
-                statusElement.innerHTML = 'Error: ' + error;
+                statusElement.innerHTML = 'Error: ' + error.message;
             });
         }
 
