@@ -1,102 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Beta Sensor Value</title>
-  <style>
-    #sensorCanvas {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+    <title>Beta Value Sender</title>
 </head>
 <body>
-  <div id="statusIndicator"></div>
-  <canvas id="sensorCanvas"></canvas>
+    <div id="status">Waiting for beta value...</div>
+    <div id="betaValue"></div>
 
-  <script>
-    const canvas = document.getElementById("sensorCanvas");
-    const ctx = canvas.getContext("2d");
-    ctx.font = "15px Arial";
+    <script>
+        const statusElement = document.getElementById("status");
+        const betaValueElement = document.getElementById("betaValue");
 
-    let startTime = 0;
-    let endTime = 0;
-    let prevBeta = 0;
-    let hasProperSeating = false;
-    let eventListenerAdded = false;
-
-    // WebSocket connection to the server
-    const ws = new WebSocket("ws://192.168.0.11:8080"); // Replace with your laptop's IP address
-
-    // Function to update the status indicator
-    function updateStatusIndicator(connected) {
-      const statusIndicator = document.getElementById("statusIndicator");
-      if (connected) {
-        statusIndicator.textContent = "Connected to Server";
-        statusIndicator.style.color = "green";
-      } else {
-        statusIndicator.textContent = "Not Connected to Server";
-        statusIndicator.style.color = "red";
-      }
-    }
-
-    // Function to update the canvas with the sensor data
-    function updateCanvas(beta) {
-      // Clear the canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Round the beta value to the nearest integer
-      const roundedBeta = Math.round(beta);
-
-      // ... (Rest of your canvas update code)
-
-      // Send the sensor value to the server
-      ws.send(JSON.stringify({ sensorValue: beta }));
-    }
-
-    // Function to start the event listeners
-    function startEventListeners() {
-      window.addEventListener("deviceorientation", deviceOrientationHandler);
-      eventListenerAdded = true;
-    }
-
-    // Event listener for device orientation change
-    function deviceOrientationHandler(event) {
-      // Get the beta value from the sensor data
-      const beta = event.beta;
-
-      // Update the canvas with the beta value
-      updateCanvas(beta);
-    }
-
-    // Ensure event listeners are started once the page is loaded
-    window.addEventListener("load", () => {
-      if (!eventListenerAdded) {
-        startEventListeners();
-      }
-    });
-
-    // WebSocket event handlers
-    ws.addEventListener("open", () => {
-      // Connection to the server is open
-      updateStatusIndicator(true);
-    });
-
-    ws.addEventListener("close", () => {
-      // Connection to the server is closed
-      updateStatusIndicator(false);
-    });
-
-    ws.addEventListener("message", (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.sensorValue !== undefined) {
-          // Update the canvas with the sensor value received from the server
-          updateCanvas(data.sensorValue);
+        // Function to send the beta value to the server
+        function sendBetaValue(betaValue) {
+            // Send beta value to the server
+            fetch('http://192.168.0.11:5000/send_beta', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ beta: betaValue })
+            })
+            .then(response => {
+                if (response.ok) {
+                    statusElement.innerHTML = 'Beta value sent successfully.';
+                } else {
+                    statusElement.innerHTML = 'Failed to send beta value.';
+                }
+            })
+            .catch(error => {
+                statusElement.innerHTML = 'Error: ' + error;
+            });
         }
-      } catch (error) {
-        console.error("Error parsing message:", error);
-      }
-    });
-  </script>
+
+        // Listen for device orientation events
+        window.addEventListener('deviceorientation', event => {
+            const beta = event.beta; // Get the beta value from the event
+
+            // Display the beta value in the HTML
+            betaValueElement.innerHTML = 'Beta Value: ' + beta;
+
+            // Send the beta value to the server
+            sendBetaValue(beta);
+        });
+    </script>
 </body>
 </html>
