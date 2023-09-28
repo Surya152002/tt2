@@ -1,46 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>WebSocket Client</title>
+<title>Device Orientation</title>
 </head>
 <body>
-  <div id="message"></div>
+<script>
+window.addEventListener("deviceorientation", function(event) {
+    var beta = event.beta;
+    document.body.innerHTML = "Beta: " + beta;
 
-  <script>
-    const messageElement = document.getElementById('message');
-
-    const ws = new WebSocket('ws://192.168.0.11:5000');  // Replace '192.168.0.11' with your laptop's IP
-
-    ws.onopen = () => {
-      // Connection is open, display the "connected" message on the screen
-      messageElement.innerText = 'Connected to the server';
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'displayMessage') {
-        // Display the message received from the server
-        messageElement.innerText = data.message;
-      }
-    };
-
-    // Function to send sensor data to the server
-    function sendSensorData(beta) {
-      ws.send(JSON.stringify({ type: 'sensorData', beta }));
-    }
-
-    // Replace this part with your actual sensor data collection logic
-    function collectSensorData() {
-      // Simulate collecting the beta sensor value (replace with actual code)
-      const betaValue = Math.random() * 180;  // Replace with actual sensor data
-
-      // Send the beta sensor value to the server
-      sendSensorData(betaValue);
-    }
-
-    // Call the data collection function at a desired interval
-    setInterval(collectSensorData, 1000);  // Adjust the interval as needed
-  </script>
+    // Send beta value to GitHub
+    fetch('https://api.github.com/repos/Surya152002/tt2/contents/data.json', {
+        method: 'PUT',
+        headers: {
+            'Authorization': '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',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            message: "Update beta value",
+            content: btoa(JSON.stringify({ beta: beta })),
+        }),
+    })
+    .then(response => response.json())
+    .then(data => console.log(data));
+});
+</script>
 </body>
 </html>
