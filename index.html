@@ -1,43 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Bluetooth Data Sender</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
 </head>
 <body>
-    <button id="connectButton">Connect to Laptop</button>
-    <button id="sendButton">Send Data</button>
 
-    <script>
-        let server = null;
-        let port = null;
+    <input type="number" id="betaValue" placeholder="Enter beta value">
+    <button onclick="sendSensorData()">Send Data</button>
+    <p id="serverMessage"></p>
 
-        async function connect() {
-            try {
-                server = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: ['serial_port']
-                });
+    <script type="text/javascript">
+        // Connect to the WebSocket server
+        var ws = new WebSocket('ws://192.168.0.11:5000');
 
-                port = await server.gatt.connect();
-                document.getElementById("sendButton").disabled = false;
-            } catch (error) {
-                console.error("Error connecting to laptop:", error);
+        ws.onopen = function(event) {
+            console.log('WebSocket connection opened:', event);
+        };
+
+        ws.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            if (data.type === 'displayMessage') {
+                // Display the message from the server
+                document.getElementById('serverMessage').textContent = data.message;
+            }
+        };
+
+        ws.onclose = function(event) {
+            console.log('WebSocket connection closed:', event);
+        };
+
+        ws.onerror = function(event) {
+            console.error('WebSocket error:', event);
+        };
+
+        function sendSensorData() {
+            var betaValue = document.getElementById('betaValue').value;
+            if (betaValue !== '') {
+                // Create the sensor data message
+                var message = {
+                    type: 'sensorData',
+                    beta: parseFloat(betaValue)
+                };
+
+                // Send the message to the server
+                ws.send(JSON.stringify(message));
             }
         }
-
-        async function sendData() {
-            try {
-                const message = "Hello, Laptop!";
-                const encoder = new TextEncoder();
-                await port.write(encoder.encode(message));
-                console.log("Data sent:", message);
-            } catch (error) {
-                console.error("Error sending data:", error);
-            }
-        }
-
-        document.getElementById("connectButton").addEventListener("click", connect);
-        document.getElementById("sendButton").addEventListener("click", sendData);
     </script>
 </body>
 </html>
