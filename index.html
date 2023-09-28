@@ -4,47 +4,37 @@
     <title>Beta Value Sender</title>
 </head>
 <body>
-    <div id="status">Waiting for beta value...</div>
-    <div id="betaValue"></div>
+    <h1>Send Beta Value</h1>
+    <form id="betaForm">
+        <label for="beta">Beta Value:</label>
+        <input type="number" id="beta" name="beta" step="0.01" required>
+        <button type="submit">Send Beta</button>
+    </form>
 
     <script>
-        const statusElement = document.getElementById("status");
-        const betaValueElement = document.getElementById("betaValue");
+        document.getElementById("betaForm").addEventListener("submit", function(event) {
+            event.preventDefault();
 
-        // Function to send the beta value to the server
-        function sendBetaValue(betaValue) {
-            // Send beta value to the server
-            fetch('http://192.168.0.11:5000/send_beta', {
-                method: 'POST',
+            const betaValue = document.getElementById("beta").value;
+
+            // Send the beta value to the laptop via a POST request
+            fetch("http://laptop_ip_address:port/receive_beta", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ beta: betaValue })
             })
             .then(response => {
                 if (response.ok) {
-                    return response.text();
+                    alert("Beta value sent successfully!");
                 } else {
-                    throw new Error('Failed to send beta value.');
+                    alert("Error sending beta value.");
                 }
             })
-            .then(data => {
-                statusElement.innerHTML = 'Server Response: ' + data;
-            })
             .catch(error => {
-                statusElement.innerHTML = 'Error: ' + error.message;
+                alert("An error occurred: " + error);
             });
-        }
-
-        // Listen for device orientation events
-        window.addEventListener('deviceorientation', event => {
-            const beta = event.beta; // Get the beta value from the event
-
-            // Display the beta value in the HTML
-            betaValueElement.innerHTML = 'Beta Value: ' + beta;
-
-            // Send the beta value to the server
-            sendBetaValue(beta);
         });
     </script>
 </body>
