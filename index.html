@@ -18,7 +18,7 @@
             const betaValue = document.getElementById("beta").value;
 
             // Send the beta value to the laptop via a POST request
-            fetch("http://laptop_ip_address:port/receive_beta", {
+            fetch("http://192.168.0.11:1766/receive_beta", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
