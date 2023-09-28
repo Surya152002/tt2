@@ -1,53 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Client</title>
+  <meta charset="utf-8">
+  <title>WebSocket Client</title>
 </head>
 <body>
+  <div id="message"></div>
 
-    <input type="number" id="betaValue" placeholder="Enter beta value">
-    <button onclick="sendSensorData()">Send Data</button>
-    <p id="serverMessage"></p>
+  <script>
+    const messageElement = document.getElementById('message');
 
-    <script type="text/javascript">
-        // Connect to the WebSocket server
-        var ws = new WebSocket('ws://192.168.0.46:37373');
+    const ws = new WebSocket('ws://192.168.0.11:5000'); // Update the server IP address
 
-        ws.onopen = function(event) {
-            console.log('WebSocket connection opened:', event);
-        };
+    ws.onopen = () => {
+      // Connection is open, display the "connected" message on the screen
+      messageElement.innerText = 'Connected to the server';
+    };
 
-        ws.onmessage = function(event) {
-            var data = JSON.parse(event.data);
-            if (data.type === 'displayMessage') {
-                // Display the message from the server
-                document.getElementById('serverMessage').textContent = data.message;
-            }
-        };
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'displayMessage') {
+        // Display the message received from the server
+        messageElement.innerText = data.message;
+      }
+    };
 
-        ws.onclose = function(event) {
-            console.log('WebSocket connection closed:', event);
-        };
+    // Function to send sensor data to the server
+    function sendSensorData(beta) {
+      ws.send(JSON.stringify({ type: 'sensorData', beta }));
+    }
 
-        ws.onerror = function(event) {
-            console.error('WebSocket error:', event);
-        };
+    // Replace this part with your actual sensor data collection logic
+    function collectSensorData() {
+      // Simulate collecting the beta sensor value (replace with actual code)
+      const betaValue = Math.random() * 180; // Replace with actual sensor data
 
-        function sendSensorData() {
-            var betaValue = document.getElementById('betaValue').value;
-            if (betaValue !== '') {
-                // Create the sensor data message
-                var message = {
-                    type: 'sensorData',
-                    beta: parseFloat(betaValue)
-                };
+      // Send the beta sensor value to the server
+      sendSensorData(betaValue);
+    }
 
-                // Send the message to the server
-                ws.send(JSON.stringify(message));
-            }
-        }
-    </script>
+    // Call the data collection function at a desired interval
+    setInterval(collectSensorData, 1000); // Adjust the interval as needed
+  </script>
 </body>
 </html>
