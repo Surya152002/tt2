@@ -1,36 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebSocket Mobile Client</title>
+    <title>Send Beta Value</title>
 </head>
 <body>
-    <h1>WebSocket Mobile Client</h1>
-    
-    <p>Beta Value: <span id="betaValue">-</span></p>
+    <h1>Send Beta Value</h1>
+    <form id="betaForm">
+        <label for="beta">Beta Value:</label>
+        <input type="number" id="beta" name="beta" step="0.01" required>
+        <button type="submit">Send Beta</button>
+    </form>
 
     <script>
-        const socket = new WebSocket('ws://192.168.0.11:8080'); // Replace with your laptop's IP address and port
-        const betaValueElement = document.getElementById('betaValue');
+        document.getElementById("betaForm").addEventListener("submit", function(event) {
+            event.preventDefault();
 
-        socket.onopen = () => {
-            console.log('WebSocket connection established');
-        };
+            const betaValue = document.getElementById("beta").value;
 
-        socket.onmessage = (event) => {
-            const receivedData = JSON.parse(event.data);
-            console.log('Received data from server:', receivedData);
-
-            // Update the HTML element with the received beta value
-            betaValueElement.innerHTML = receivedData.beta;
-        };
-
-        socket.onclose = () => {
-            console.log('WebSocket connection closed');
-        };
-
-        socket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
+            // Send the beta value to the laptop via a POST request
+            fetch("https://192.168.0.11:1766/receive_beta", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ beta: betaValue })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Beta value sent successfully!");
+                } else {
+                    alert("Error sending beta value.");
+                }
+            })
+            .catch(error => {
+                alert("An error occurred: " + error);
+            });
+        });
     </script>
 </body>
 </html>
