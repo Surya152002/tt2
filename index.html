@@ -6,7 +6,7 @@
 <body>
     <h1>Send Beta Value</h1>
     <form id="betaForm">
-        <label for="beta">Beta Value:</label>
+        <label for="beta">Beta Value1:</label>
         <input type="number" id="beta" name="beta" step="0.01" required>
         <button type="submit">Send Beta</button>
     </form>
@@ -29,7 +29,7 @@
                 if (response.ok) {
                     alert("Beta value sent successfully!");
                 } else {
-                    alert("Error sending beta value.");
+                    alert("Error sending beta value. Please try again.");
                 }
             })
             .catch(error => {
