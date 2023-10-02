@@ -56,7 +56,7 @@
                 const currentTime = new Date().getTime();
                 const elapsedBack = (currentTime - backToSeatTime) / 1000;
                 if (elapsedBack > 5 && flag !== 2) {  // 5 seconds threshold for returning to seat
-                    flag = 2;
+                    flag = 3;
                     updateFlagValue(flag);
                     console.log('User came back to sitting position');
                 }
