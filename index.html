@@ -41,7 +41,7 @@
                 const currentTime = new Date().getTime();
                 const elapsedInitial = (currentTime - initialPositionTime) / 1000;
                 if (elapsedInitial > 20 && flag !== 1) {
-                    flag = 1;
+                    flag = 3;
                     updateFlagValue(flag);
                     console.log('User is resting');
                 }
